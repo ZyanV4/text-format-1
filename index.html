@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Format Input Output - ["Aku Sigma!", "Aku Sigma!"],</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text x='0' y='28' font-size='27' font-family='Arial'>&#x1F3A8;</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
+    <style>
+        :root {
+            --main-purple: #9B5DE5;
+            --main-yellow: #FEE440;
+            --main-green: #00F5D4;
+            --main-pink: #FF006E;
+        }
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: linear-gradient(to bottom, #9B5DE5, #FF006E);
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #FEE440, #00F5D4);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #00F5D4, #9B5DE5);
+        }
+        ::placeholder {
+            opacity: 1 !important;
+            color: #000000 !important;
+        }
+        .cartoon-border {
+            border: 4px solid black;
+            border-radius: 12px;
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
+        }
+        .cartoon-button {
+            border: 3px solid black;
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+        }
+        .cartoon-button:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
+        }
+        div:where(.swal2-icon).swal2-success [class^=swal2-success-line] {
+            background: #16a34a;
+        }
+        div:where(.swal2-icon).swal2-success .swal2-success-ring {
+            border: .25em solid #16a34a;
+        }
+        div:where(.swal2-container) div:where(.swal2-loader) {
+
+        }
+        div:where(.swal2-icon).swal2-warning {
+            border-color: rgb(234 88 12);
+            color: #ea580c;
+        }
+        @media (max-width: 1024px) {
+            #inputLeft, #inputRight {
+                height: 140px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-[var(--main-purple)] via-[var(--main-pink)] to-[var(--main-yellow)] min-h-screen flex items-center justify-center">
+
+    <div class="bg-white cartoon-border p-8 m-5 sm:m-10 lg:m-0 w-full max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-4 lg:mb-5">
+            <h1 class="text-4xl font-bold text-black flex items-center justify-center gap-2 cartoon-border p-3 bg-[var(--main-yellow)]">
+                <span>🎨</span> Format Input Output
+            </h1>
+            <p class="text-lg text-gray-800 mt-2">
+                <span class="text-transparent bg-gradient-to-r from-purple-500 via-yellow-400 to-pink-500 bg-clip-text font-bold">["Aku Sigma!", "Aku Sigma!"],</span>
+                <br>
+                Masukkan data di kolom kiri dan kanan, lalu lihat hasilnya!
+            </p>
+        </div>
+
+        <!-- Input Fields -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-4 lg:mb-6">
+            <textarea id="inputLeft" placeholder="Masukkan data belah kiri..." rows="6"
+                class="w-full cartoon-border bg-[var(--main-green)] text-black p-4 focus:ring-4 focus:ring-[var(--main-pink)] focus:outline-none"></textarea>
+            <textarea id="inputRight" placeholder="Masukkan data belah kanan..." rows="6"
+                class="w-full cartoon-border bg-[var(--main-green)] text-black p-4 focus:ring-4 focus:ring-[var(--main-pink)] focus:outline-none"></textarea>
+        </div>
+
+        <!-- Button Actions -->
+        <div class="flex flex-wrap items-center justify-between gap-3 lg:gap-4">
+            <div class="text-gray-900">
+                <p>Data Kiri : <span id="countLeft" class="font-bold text-[var(--main-pink)]">0</span></p>
+                <p>Data Kanan : <span id="countRight" class="font-bold text-[var(--main-pink)]">0</span></p>
+            </div>
+            <div class="flex flex-wrap gap-3 md:gap-4">
+                <!-- Reset Button -->
+                <button id="reset"
+                    class="cartoon-button px-5 py-2 bg-gray-300 text-black rounded-lg hover:bg-[var(--main-pink)] transition-all">
+                    Reset 🔄
+                </button>
+
+                <button id="generate"
+                    class="cartoon-button px-5 py-2 bg-[var(--main-purple)] text-white rounded-lg hover:bg-[var(--main-pink)] transition-all">
+                    Generate 🎉
+                </button>
+                <button id="generateReverse"
+                    class="cartoon-button px-5 py-2 bg-[var(--main-yellow)] text-black rounded-lg hover:bg-[var(--main-pink)] transition-all">
+                    Generate Reverse 🔄
+                </button>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div id="result" class="mt-4 md:mt-6 p-4 bg-gray-100 cartoon-border text-black whitespace-pre-wrap"></div>
+
+        <!-- Copy to Clipboard -->
+        <div class="mt-4 text-center hidden" id="copy-container">
+            <button id="copy"
+                class="cartoon-button px-5 py-2 bg-[var(--main-green)] text-black rounded-lg hover:bg-[var(--main-pink)] transition-all">
+                Copy to Clipboard ✂️
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function updateDataCount() {
+            const inputLeft = document.getElementById('inputLeft').value.trim().split('\n').filter(Boolean);
+            const inputRight = document.getElementById('inputRight').value.trim().split('\n').filter(Boolean);
+    
+            document.getElementById('countLeft').textContent = inputLeft.length;
+            document.getElementById('countRight').textContent = inputRight.length;
+        }
+    
+        function formatResult(inputLeft, inputRight, reverse = false) {
+            let maxLength = Math.max(inputLeft.length, inputRight.length);
+            let result = [];
+    
+            for (let i = 0; i < maxLength; i++) {
+                result.push([inputLeft[i] || "", inputRight[i] || ""]);
+            }
+    
+            if (reverse) {
+                result = result.reverse();
+            }
+    
+            return result.map(pair => `["${pair[0]}", "${pair[1]}"],`).join('\n');
+        }
+    
+        // Reset function
+        function resetAll() {
+            document.getElementById('inputLeft').value = '';
+            document.getElementById('inputRight').value = '';
+            document.getElementById('countLeft').textContent = '0';
+            document.getElementById('countRight').textContent = '0';
+            document.getElementById('result').textContent = '';
+            document.getElementById('copy-container').classList.add('hidden');
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: 'Data sudah di reset!',
+                didOpen: (popup) => {
+                    popup.classList.add('cartoon-border');
+                    Swal.getConfirmButton().classList.add('cartoon-button', 'bg-green-600', 'hover:bg-[var(--main-pink)]', 'transition-all');
+                },
+            });
+        }
+    
+        document.getElementById('inputLeft').addEventListener('input', updateDataCount);
+        document.getElementById('inputRight').addEventListener('input', updateDataCount);
+    
+        document.getElementById('generate').addEventListener('click', () => {
+            const inputLeft = document.getElementById('inputLeft').value.trim().split('\n').filter(Boolean);
+            const inputRight = document.getElementById('inputRight').value.trim().split('\n').filter(Boolean);
+
+            // Mengecek jika kedua input kosong
+            if (inputLeft.length === 0 && inputRight.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'Data belum terisi di kedua kolom!',
+                    didOpen: (popup) => {
+                        popup.classList.add('cartoon-border');
+                        Swal.getConfirmButton().classList.add('cartoon-button', 'bg-orange-600', 'hover:bg-[var(--main-pink)]', 'transition-all');
+                    },
+                });
+            } else {
+                // Menampilkan SweetAlert loading sebelum memproses
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Sedang memproses data...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: (popup) => {
+                        Swal.showLoading();
+                        popup.classList.add('cartoon-border');
+                    },
+                });
+
+                // Menunda 1 detik sebelum menghapus SweetAlert dan menampilkan hasil
+                setTimeout(() => {
+                    // Proses formatting
+                    const formattedResult = formatResult(inputLeft, inputRight);
+
+                    // Menampilkan hasil setelah proses selesai
+                    document.getElementById('result').textContent = formattedResult;
+
+                    // Menampilkan tombol copy jika ada hasil
+                    if (formattedResult.trim() !== '') {
+                        document.getElementById('copy-container').classList.remove('hidden');
+                    }
+
+                    // Menutup SweetAlert loading dan menampilkan pesan sukses
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Hasil telah diproses!',
+                        didOpen: (popup) => {
+                            popup.classList.add('cartoon-border');
+                            Swal.getConfirmButton().classList.add('cartoon-button', 'bg-green-600', 'hover:bg-[var(--main-pink)]', 'transition-all');
+                        },
+                    });
+                }, 300); // Delay 1 detik sebelum melanjutkan ke langkah berikutnya
+            }
+        });
+    
+        document.getElementById('generateReverse').addEventListener('click', () => {
+            const inputLeft = document.getElementById('inputLeft').value.trim().split('\n').filter(Boolean);
+            const inputRight = document.getElementById('inputRight').value.trim().split('\n').filter(Boolean);
+
+            // Mengecek jika kedua input kosong
+            if ((inputLeft.length < 2 && inputRight.length < 2) || inputLeft.length === 0 || inputRight.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'Harus ada minimal 2 data di salah satu kolom dan 1 data di kolom lainnya!',
+                    didOpen: (popup) => {
+                        popup.classList.add('cartoon-border');
+                        Swal.getConfirmButton().classList.add('cartoon-button', 'bg-orange-600', 'hover:bg-[var(--main-pink)]', 'transition-all');
+                    },
+                });
+            } else {
+                // Menampilkan SweetAlert loading sebelum memproses
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Sedang memproses data...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: (popup) => {
+                        Swal.showLoading();
+                        popup.classList.add('cartoon-border');
+                    },
+                });
+
+                // Menunda 1 detik sebelum menghapus SweetAlert dan menampilkan hasil
+                setTimeout(() => {
+                    const formattedResult = formatResult(inputLeft, inputRight, true);
+                    document.getElementById('result').textContent = formattedResult;
+
+                    // Menampilkan tombol copy jika ada hasil
+                    if (formattedResult.trim() !== '') {
+                        document.getElementById('copy-container').classList.remove('hidden');
+                    }
+
+                    // Menutup SweetAlert loading dan menampilkan pesan sukses
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Hasil telah diproses!',
+                        didOpen: (popup) => {
+                            popup.classList.add('cartoon-border');
+                            Swal.getConfirmButton().classList.add('cartoon-button', 'bg-green-600', 'hover:bg-[var(--main-pink)]', 'transition-all');
+                        },
+                    });
+                }, 300); // Delay 1 detik sebelum melanjutkan ke langkah berikutnya
+            }
+            
+        });
+    
+        document.getElementById('copy').addEventListener('click', () => {
+            const result = document.getElementById('result').textContent;
+    
+            if (result.trim() === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'Data masih kosong!',
+                    didOpen: (popup) => {
+                        popup.classList.add('cartoon-border');
+                        Swal.getConfirmButton().classList.add('cartoon-button', 'bg-orange-600', 'hover:bg-[var(--main-pink)]', 'transition-all');
+                    },
+                });
+            } else {
+                navigator.clipboard.writeText(result).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Hasil berhasil disalin ke clipboard!',
+                        didOpen: (popup) => {
+                            popup.classList.add('cartoon-border');
+                            Swal.getConfirmButton().classList.add('cartoon-button', 'bg-green-600', 'hover:bg-[var(--main-pink)]', 'transition-all');
+                        },
+                    });
+                });
+            }
+        });
+    
+        // Event listener untuk reset
+        document.getElementById('reset').addEventListener('click', resetAll);
+    </script>
+    
+
+</body>
+</html>
